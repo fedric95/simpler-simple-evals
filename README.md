@@ -1,10 +1,8 @@
 # Overview
 
-Super simplified (and custom) evaluation protocol. The results that you obtain with this approach are not comparable to those that you would obtain with the original repo (I took only inspiration). I mainly use this repo for personal evaluation.
-
+Super simplified (and custom) evaluation protocol. The results that you obtain with this repo are not comparable to those that you would obtain with the original repo (I took only inspiration). I mainly use this repo for personal evaluation.
 
 Limited use: not for commercial applications.
-
 
 # Single-answer
 

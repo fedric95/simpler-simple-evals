@@ -9,13 +9,13 @@ from clients import OpenAI
 load_dotenv()
 
 QUERY_TEMPLATE = {
-    'english': """Solve the following math problem step by step. The last line of your response should be of the form Answer: $ANSWER (without quotes) where $ANSWER is the answer to the problem.
+    'english': """Answer the following problem step by step. The last line of your response should be of the form Answer: $ANSWER (without quotes) where $ANSWER is the answer to the problem.
 
 {question}
 
 Remember to put your answer on its own line after "Answer:", and you do not need to use a \\boxed command.""",
 
-    'italian': """Risolvi il seguente problema di matematica passo dopo passo. L’ultima riga della tua risposta dovrebbe essere nella forma Answer: $ANSWER (senza virgolette), dove $ANSWER è la risposta al problema.
+    'italian': """Rispondi al seguente problema passo dopo passo. L’ultima riga della tua risposta dovrebbe essere nella forma Answer: $ANSWER (senza virgolette), dove $ANSWER è la risposta al problema.
 
 {question}
 

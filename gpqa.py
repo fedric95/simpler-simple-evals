@@ -10,14 +10,16 @@ from clients import OpenAI
 load_dotenv()
 
 QUERY_TEMPLATE_MULTICHOICE = {
-    'english': """Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering.
+    'english': """Answer the following multiple choice problem step by step. The last line of your response should be of the form Answer: $ANSWER (without quotes) where $ANSWER is the answer to the problem and is one of ABCD.
 
 {question}
 
 A) {A}
 B) {B}
 C) {C}
-D) {D}"""
+D) {D}
+
+Remember to put your answer on its own line after "Answer:", and you do not need to use a \\boxed command.""",
 }
 
 
@@ -72,9 +74,3 @@ if __name__== '__main__':
         )
         results.append(task)
     pool.close()
-
-    #match = re.search(ANSWER_PATTERN_MULTICHOICE, response_text)
-    #extracted_answer = match.group(1) if match else None
-    #score = 1.0 if extracted_answer == correct_answer else 0.0
-    #import pdb
-    #pdb.set_trace()
