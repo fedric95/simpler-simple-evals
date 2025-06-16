@@ -8,19 +8,14 @@ from clients import OpenAI
 
 load_dotenv()
 
+
+
 QUERY_TEMPLATE = {
-    'english': """Answer the following problem step by step. The last line of your response should be of the form Answer: $ANSWER (without quotes) where $ANSWER is the answer to the problem.
+    'english': """Answer the following problem. Please reason step by step, and put your final answer within \\boxed{{}}.
 
-{question}
-
-Remember to put your answer on its own line after "Answer:", and you do not need to use a \\boxed command.""",
-
-    'italian': """Rispondi al seguente problema passo dopo passo. L’ultima riga della tua risposta dovrebbe essere nella forma Answer: $ANSWER (senza virgolette), dove $ANSWER è la risposta al problema.
-
-{question}
-
-Ricorda di mettere la tua risposta su una riga a parte dopo "Answer:", e non è necessario usare il comando \\boxed."""
+{question}"""
 }
+ANSWER_TEMPLATE = r"(?i)\\boxed\{\s*([^\n]+)\s*\}"
 
 
 EQUALITY_TEMPLATE = """Look at the following two expressions (answers to a math problem) and judge whether they are equivalent. Only perform trivial simplifications
@@ -95,7 +90,7 @@ class Experiment:
         
     def __call__(self, task):
         task['answer'] = self.sut(task['question'])
-        match = re.findall(r"(?i)Answer\s*:\s*([^\n]+)", task['answer'])
+        match = re.findall(ANSWER_TEMPLATE, task['answer'])
         task['y_pred'] = match[-1] if len(match) else None
 
         if task['y_pred'] is None:
@@ -119,10 +114,13 @@ if __name__ == '__main__':
     sut = OpenAI(
         base_url="https://api.studio.nebius.com/v1/",
         api_key=os.environ.get("NEBIUS_API_KEY"),
-        model_name='deepseek-ai/DeepSeek-R1-0528',
-        temperature=0.0,
-        max_completion_tokens=2048
+        model_name='Qwen/Qwen3-4B-fast',
+        temperature=0.6,
+        max_completion_tokens=38912, # based on suggestion in HuggingFace
+        top_p=0.95,
+        top_k=20
     )
+    print(sut.get_params())
 
     dataset = load_dataset('HuggingFaceH4/MATH-500', token=os.environ.get("HF_TOKEN"))
     dataset = pd.DataFrame(dataset['test'].to_dict())
@@ -133,7 +131,7 @@ if __name__ == '__main__':
         tasks.append({'question': question, 'y': row.answer})
 
     run = Experiment(sut)
-    pool = multiprocessing.Pool(processes=20)
+    pool = multiprocessing.Pool(processes=min(len(tasks), 20))
     results = []
     for task in pool.imap(run, tasks):
         print(

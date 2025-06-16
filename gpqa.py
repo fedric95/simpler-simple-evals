@@ -9,17 +9,16 @@ from clients import OpenAI
 
 load_dotenv()
 
+
 QUERY_TEMPLATE_MULTICHOICE = {
-    'english': """Answer the following multiple choice problem step by step. The last line of your response should be of the form Answer: $ANSWER (without quotes) where $ANSWER is the answer to the problem and is one of ABCD.
+    'english': """Answer the following multiple choice problem. Please reason step by step, and put your final answer within \\boxed{{}}. The answer to the problem and is one of ABCD. Include only of these letters in the final answer.
 
 {question}
 
 A) {A}
 B) {B}
 C) {C}
-D) {D}
-
-Remember to put your answer on its own line after "Answer:", and you do not need to use a \\boxed command.""",
+D) {D}""",
 }
 
 
@@ -28,11 +27,13 @@ if __name__== '__main__':
     sut = OpenAI(
         base_url="https://api.studio.nebius.com/v1/",
         api_key=os.environ.get("NEBIUS_API_KEY"),
-        model_name='deepseek-ai/DeepSeek-R1-0528',
-        temperature=0.0,
-        max_completion_tokens=2048
+        model_name='Qwen/Qwen3-4B-fast',
+        temperature=0.6,
+        max_completion_tokens=38912, # based on suggestion in HuggingFace
+        top_p=0.95,
+        top_k=20
     )
-
+    print(sut.get_params())
     dataset = load_dataset('Idavidrein/gpqa', 'gpqa_diamond', token=os.environ.get("HF_TOKEN"))
     dataset = pd.DataFrame(dataset['train'])
     rng = random.Random(0)
@@ -64,7 +65,7 @@ if __name__== '__main__':
         })
 
     run = Experiment(sut)
-    pool = multiprocessing.Pool(processes=20)
+    pool = multiprocessing.Pool(processes=min(len(tasks), 20))
     results = []
     for task in pool.imap(run, tasks):
         print(
