@@ -14,7 +14,7 @@ if __name__ == '__main__':
     sut = OpenAI(
         base_url="https://api.studio.nebius.com/v1/",
         api_key=os.environ.get("NEBIUS_API_KEY"),
-        model_name='Qwen/Qwen3-4B-fast-LoRa:unc-cBOJ',
+        model_name='Qwen/Qwen3-4B-fast',
         temperature=0.6,
         max_completion_tokens=38912, # based on suggestion in HuggingFace
         top_p=0.95,
