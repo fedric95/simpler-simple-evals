@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "simpler_simple_evals"
+version = "0.0"
+authors = [
+    { name="Federico Ricciuti", email="ricciuti.federico@gmail.com"},
+]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "openai==1.70.0",
+    "datasets==3.6.0",
+    "pandas==2.2.3",
+    "python-dotenv==1.0.1",
+    "tiktoken==0.9.0",
+    "numpy==2.2.5"
+]

@@ -1,14 +1,13 @@
+import os
 import pandas as pd
 from datasets import load_dataset
-import os
-import re
 from dotenv import load_dotenv
+import re
 import multiprocessing
-from clients import OpenAI
+
+from .clients import OpenAI
 
 load_dotenv()
-
-
 
 QUERY_TEMPLATE = {
     'english': """Answer the following problem. Please reason step by step, and put your final answer within \\boxed{{}}.
@@ -109,38 +108,40 @@ class Experiment:
         return task
 
 
+    def run(self, tasks, processes=20):
+        pool = multiprocessing.Pool(processes=min(len(tasks), processes))
+        results = []
+        for task in pool.imap(self, tasks):
+            print(
+                task['y_pred'],
+                task['y'],
+                task['match']
+            )
+            results.append(task)
+        pool.close()
+        return results
+
+def load():
+    dataset = load_dataset('HuggingFaceH4/MATH-500', token=os.environ.get("HF_TOKEN"))
+    dataset = pd.DataFrame(dataset['test'].to_dict())
+    tasks = []
+    for _, row in dataset.iterrows():
+        question = QUERY_TEMPLATE['english'].format(question=row.problem)
+        tasks.append({'question': question, 'y': row.answer})
+    return tasks
+
 if __name__ == '__main__':
     
     sut = OpenAI(
         base_url="https://api.studio.nebius.com/v1/",
         api_key=os.environ.get("NEBIUS_API_KEY"),
-        model_name='Qwen/Qwen3-4B-fast',
+        model_name='Qwen/Qwen3-4B-fast-LoRa:last-wtTM',
         temperature=0.6,
         max_completion_tokens=38912, # based on suggestion in HuggingFace
         top_p=0.95,
         top_k=20
     )
     print(sut.get_params())
-
-    dataset = load_dataset('HuggingFaceH4/MATH-500', token=os.environ.get("HF_TOKEN"))
-    dataset = pd.DataFrame(dataset['test'].to_dict())
-
-    tasks = []
-    for _, row in dataset.iterrows():
-        question = QUERY_TEMPLATE['english'].format(question=row.problem)
-        tasks.append({'question': question, 'y': row.answer})
-
-    run = Experiment(sut)
-    pool = multiprocessing.Pool(processes=min(len(tasks), 20))
-    results = []
-    for task in pool.imap(run, tasks):
-        print(
-            task['y_pred'],
-            task['y'],
-            task['match']
-        )
-        results.append(task)
-    pool.close()
-
-    df = pd.DataFrame(results)
-    df.to_excel('ft_new.xlsx')
+    tasks = load()[:3]
+    experiment = Experiment(sut)
+    results = experiment.run(tasks, 20)
