@@ -12,3 +12,15 @@ Limited use: not for commercial applications.
 # Multi-choice
 
 - GPQA
+
+# Install
+
+ ``` 
+pip install -e .
+ ``` 
+
+and for a simple test (after having set all the os env variables needed for the provider of your choice).
+
+ ``` 
+python example.py
+ ``` 
