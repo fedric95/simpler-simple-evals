@@ -24,3 +24,26 @@ and for a simple test (after having set all the os env variables needed for the 
  ``` 
 python example.py
  ``` 
+
+# Inference Settings
+
+For all the experiments that require intensive reasoning, I have used:
+```
+max_completion_tokens=38912
+```
+
+## Qwen3 & Qwen2.5 (Based on HF suggestions for Qwen3)
+```
+temperature=0.6
+top_p=0.95
+top_k=20
+```
+## Gemma3 (Based on unsloth suggestions)
+```
+temperature=1.0
+top_p=0.95
+top_k=64
+```
+## Mistral Small 3.2
+```
+temperature=0.15

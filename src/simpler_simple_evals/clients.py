@@ -1,4 +1,55 @@
+import os
 import openai
+import mistralai
+
+class Mistral:
+
+    def __init__(
+        self,
+        api_key,
+        model_name,
+        temperature=None,
+        top_p=None,
+        max_completion_tokens=None
+    ):
+        self.api_key = api_key
+        self.model_name = model_name
+        self.temperature = temperature
+        self.top_p = top_p
+        self.max_completion_tokens = max_completion_tokens
+
+    def get_params(self):
+        return {
+            'model_name': self.model_name,
+            'temperature': self.temperature,
+            'max_completion_tokens': self.max_completion_tokens,
+            'top_p': self.top_p
+        }
+
+    def __call__(self, text):
+        client = mistralai.Mistral(
+            api_key=self.api_key
+        )
+
+        max_tries = 50
+        tries = 0
+        
+        while True:
+            try:
+                completion = client.chat.complete(
+                    model=self.model_name,
+                    messages=[{ "role": "user", "content": text}],
+                    temperature=self.temperature,
+                    top_p=self.top_p,
+                    max_tokens=self.max_completion_tokens
+                )
+                return completion.choices[0].message.content
+            except Exception as e:
+                print(e)
+                tries += 1
+                if tries == max_tries:
+                    raise e
+
 
 class OpenAI:
     def __init__(

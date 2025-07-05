@@ -4,3 +4,4 @@ pandas==2.2.3
 python-dotenv==1.0.1
 tiktoken==0.9.0
 numpy==2.2.5
+mistralai==1.9.1

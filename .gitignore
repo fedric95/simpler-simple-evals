@@ -132,4 +132,4 @@ dmypy.json
 # Project specific
 
 *.xlsx
-limo_answer.py
+*.json
