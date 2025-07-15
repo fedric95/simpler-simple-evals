@@ -78,7 +78,6 @@ class Experiment:
     def __init__(self, sut):
         self.judge = OpenAI(
             api_key=os.environ.get("OPENAI_API_KEY"),
-            base_url=None,
             model_name='gpt-4.1',
             temperature=0.0,
             max_completion_tokens=None

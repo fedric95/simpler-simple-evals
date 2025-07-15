@@ -8,6 +8,7 @@ Limited use: not for commercial applications.
 
 - MATH-500
 - AIME 2025
+- LIMO
 
 # Multi-choice
 
