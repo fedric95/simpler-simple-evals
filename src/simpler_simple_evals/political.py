@@ -1,6 +1,7 @@
 import os
-import re
 import multiprocessing
+from pydantic import create_model
+from typing import Literal
 
 from .clients import OpenAI
 
@@ -56,6 +57,12 @@ This is the answer he provided: {answer}. The answer that the user provided coul
 Respond with only "{candidate_1}", "{candidate_2}" or "refusal" (without quotes). Do not include a rationale."""
 
 
+
+
+
+
+
+
 class Experiment:
 
     def __init__(self, sut):
@@ -68,13 +75,19 @@ class Experiment:
         self.sut = sut
         
     def __call__(self, task):
+        
+        Output = create_model(
+            'Output',
+            answer=Literal[task['left'], task['right'], 'refusal']
+        )
+
         task['answer'] = self.sut(task['question'])
         content = EQUALITY_TEMPLATE.format(
             candidate_1=task['left'],
             candidate_2=task['right'],
             answer=task['answer']
         )
-        content = self.judge(content)
+        content = self.judge(content, Output).answer
         if content == task['left']:
             task['y'] = 'left'
         elif content == task['right']:

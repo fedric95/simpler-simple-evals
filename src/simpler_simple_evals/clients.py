@@ -110,6 +110,7 @@ class Nebius:
                 if tries == max_tries:
                     raise e
 
+
 class OpenAI:
     def __init__(
         self,
@@ -133,7 +134,11 @@ class OpenAI:
             'top_p': self.top_p
         }
 
-    def __call__(self, text):
+    def __call__(
+        self,
+        text,
+        response_format=None
+    ):
         client = openai.OpenAI(
             api_key=self.api_key,
         )
@@ -143,14 +148,25 @@ class OpenAI:
         
         while True:
             try:
-                completion = client.chat.completions.create(
-                    model=self.model_name,
-                    temperature=self.temperature,
-                    messages=[{ 'role': 'user', 'content': text}],
-                    max_completion_tokens=self.max_completion_tokens,
-                    top_p=self.top_p
-                )
-                return completion.choices[0].message.content
+                if response_format is None:
+                    completion = client.chat.completions.create(
+                        model=self.model_name,
+                        temperature=self.temperature,
+                        messages=[{ 'role': 'user', 'content': text}],
+                        max_completion_tokens=self.max_completion_tokens,
+                        top_p=self.top_p
+                    )
+                    return completion.choices[0].message.content
+                else:
+                    completion = client.beta.chat.completions.parse(
+                        model=self.model_name,
+                        temperature=self.temperature,
+                        messages=[{ 'role': 'user', 'content': text}],
+                        max_completion_tokens=self.max_completion_tokens,
+                        top_p=self.top_p,
+                        response_format=response_format
+                    )
+                    return completion.choices[0].message.parsed
             except Exception as e:
                 print(e)
                 tries += 1
